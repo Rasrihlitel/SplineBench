@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="SplineBench/SplineBench.vcxproj" Id="1085806c-75f9-4f40-8b44-fcb063fefd74" />
+</Solution>
