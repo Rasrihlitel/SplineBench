@@ -1,5 +1,6 @@
 #include "splineFunc.h"
 #include <stdexcept>
+#include <fstream>
 
 void sweepMethod( //Решение трехдиагональной матрицы
 	const std::vector<double>& A, 
@@ -31,16 +32,16 @@ void sweepMethod( //Решение трехдиагональной матриц
 CoeffSpline calculateCoeff(const std::vector<double>& x, const std::vector<double>& y) { //Вычисление коэффициентов сплайна
 	int size = x.size();
 
-	//Проверка корректности входных данных
+	//Проверка входных данных
 	if (size != y.size()) {
-		throw std::invalid_argument("Размеры массивов x и y должны совпадать.");
+		throw std::invalid_argument("The sizes of the x and y arrays must match");
 	}
 	if (size < 2) {
-		throw std::invalid_argument("Нужно как минимум 2 точки.");
+		throw std::invalid_argument("You need at least 2 points");
 	}
 	for (int i = 0; i < size - 1; i++) {
 		if (x[i + 1] <= x[i]) {
-			throw std::invalid_argument("Значения x должны быть строго возрастающими!");
+			throw std::invalid_argument("The values of x must be strictly increasing");
 		}
 	}
 
@@ -52,12 +53,12 @@ CoeffSpline calculateCoeff(const std::vector<double>& x, const std::vector<doubl
 	coef.d.resize(size);
 	std::vector<double> h(size - 1);
 
-	//Подсчет h[i] = x[i] - x[i-1] (как в методичке, но в программе - смещение)
+	//Подсчет h[i] = x[i] - x[i-1] (как в методичке, но тут смещение)
 	for (int i = 0; i < size - 1; i++) {
 		h[i] = x[i + 1] - x[i];
 	}
 
-	//Подсчет коэффициентов системы A[i]c[i-1] + C[i]c[i] + B[i]c[i+1] = F[i]
+	//Подсчет коэффициентов системы A[i]c[i-1] + C[i]c[i] + B[i]c[i+1] = F[i] - вынести в подготовку данных
 	std::vector<double> A(size, 0.0), C(size, 0.0), B(size, 0.0), F(size, 0.0);
 	C[0] = 1.0;
 	C[size - 1] = 1.0;
@@ -68,7 +69,7 @@ CoeffSpline calculateCoeff(const std::vector<double>& x, const std::vector<doubl
 		F[i] = 6.0 * ((y[i + 1] - y[i]) / h[i] - (y[i] - y[i - 1]) / h[i - 1]);
 	}
 
-	//Решение системы
+	//Решение системы - вынести в другую функцию
 	sweepMethod(A, B, C, F, coef.c);
 
 	//Вычисление коэффициентов
@@ -82,16 +83,16 @@ CoeffSpline calculateCoeff(const std::vector<double>& x, const std::vector<doubl
 	return coef;
 }
 
-double evaluateSpline(const CoeffSpline& coef, const std::vector<double>& x, double x_val) { //Вычисление значения сплайна в точке
+double evaluateSpline(const CoeffSpline& coef, const std::vector<double>& x, double xVal) { //Вычисление значения сплайна в точке
 	int size = x.size();
-	if (x_val < x.front() || x_val > x.back()) {
-		throw std::out_of_range("Точка лежит вне области интерполяции!");
+	if (xVal < x.front() || xVal > x.back()) {
+		throw std::out_of_range("The point lies outside the interpolation area");
 	}
-	//Бинарный поиск, так как быстрее
+	//Бинарный поиск, так как быстрее - в отдельный файл
 	int left = 0, right = size - 1;
 	while (left < right - 1) {
 		int mid = left + (right - left) / 2;
-		if (x[mid] <= x_val) {
+		if (x[mid] <= xVal) {
 			left = mid;
 		}
 		else {
@@ -100,6 +101,28 @@ double evaluateSpline(const CoeffSpline& coef, const std::vector<double>& x, dou
 	}
 
 	//Вычисление в точке
-	double dx = x_val - x[right];
+	double dx = xVal - x[right];
 	return coef.a[right] + coef.b[right] * dx + (coef.c[right] / 2.0) * dx * dx + (coef.d[right] / 6.0) * dx * dx * dx;
+}
+
+void exportSplineToCSV(const CoeffSpline& coef, const std::vector<double>& x, int numPoints) { //Рисовка графика
+	if (x.size() < 2) {
+		throw std::invalid_argument("You need at least 2 nodes");
+	}
+	if (numPoints < 2) {
+		numPoints = 2;
+	}
+
+	double step = (x.back() - x.front()) / (numPoints - 1);
+	std::ofstream file("printSpline.csv");
+	if (file.is_open() == false) {
+		return;
+	}
+	file << "x;y" << std::endl;
+	for (int i = 0; i < numPoints; i++) {
+		double xVal = x.front() + i * step;
+		double yVal = evaluateSpline(coef, x, xVal);
+		file << xVal << ";" << yVal << std::endl;
+	}
+	file.close();
 }

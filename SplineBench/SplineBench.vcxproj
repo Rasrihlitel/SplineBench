@@ -139,11 +139,14 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="SplineBench.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="splineFunc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="splineFunc.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="printSpline.py" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,2 +1,7 @@
-﻿  SplineBench.cpp
+﻿  main.cpp
+  splineFunc.cpp
+C:\Users\Леша\source\repos\SplineBench\SplineBench\splineFunc.cpp(12,11): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Леша\source\repos\SplineBench\SplineBench\splineFunc.cpp(33,11): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Леша\source\repos\SplineBench\SplineBench\splineFunc.cpp(87,11): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  Создание кода...
   SplineBench.vcxproj -> C:\Users\Леша\source\repos\SplineBench\x64\Debug\SplineBench.exe
